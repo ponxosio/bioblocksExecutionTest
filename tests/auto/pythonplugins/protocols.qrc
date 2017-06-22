@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/protocols">
+        <file>protocols/quemostat_30s.json</file>
+        <file>protocols/turbidostat_not_time.json</file>
+    </qresource>
+</RCC>
