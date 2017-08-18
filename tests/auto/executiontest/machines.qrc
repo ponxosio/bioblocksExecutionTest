@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/machines">
         <file>machines/turbidostat_test.json</file>
+        <file>machines/machineV2complexValveTest.json</file>
     </qresource>
 </RCC>
