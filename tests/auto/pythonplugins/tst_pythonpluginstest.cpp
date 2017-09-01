@@ -35,6 +35,7 @@ private Q_SLOTS:
 
     void testCase1();
     void testCase2();
+    void EVOPROG_no_cleaning();
 };
 
 PythonpluginsTest::PythonpluginsTest()
@@ -125,6 +126,58 @@ void PythonpluginsTest::testCase2()
 
             copyResourceFile(":/protocols/protocols/turbidostat2.json", tempFileProtocol);
             copyResourceFile(":/machines/machines/turbidostat_test.json", tempFileMachine);
+
+            std::string protocolFilePath = tempFileProtocol->fileName().toStdString();
+            std::string machineFilePath = tempFileMachine->fileName().toStdString();
+            units::Time timeSlice = 1 * units::s;
+
+            execution.executeNewProtocol(protocolFilePath, machineFilePath, timeSlice);
+
+            PythonEnvironment::GetInstance()->finishEnvironment();
+            command->disconnect();
+
+            QVERIFY(true);
+        } catch (std::exception & e) {
+            PythonEnvironment::GetInstance()->finishEnvironment();
+            command->disconnect();
+
+            QFAIL(e.what());
+        }
+    } else {
+        QFAIL("Imposible to create temporary file");
+    }
+}
+
+void PythonpluginsTest::EVOPROG_no_cleaning() {
+    QTemporaryFile* tempFileProtocol = new QTemporaryFile();
+    QTemporaryFile* tempFileMachine = new QTemporaryFile();
+
+    QTemporaryFile* output = new QTemporaryFile();
+    QTemporaryFile* data = new QTemporaryFile();
+
+    if (tempFileProtocol->open() &&
+            tempFileMachine->open() &&
+            output->open() &&
+            data->open())
+    {
+        std::string outFile = output->fileName().toStdString();
+        std::string dataFile = data->fileName().toStdString();
+        std::shared_ptr<CommandSender> command = std::make_shared<FileSender>(outFile, dataFile);
+
+        try {
+            command->connect();
+
+            std::string pluginFolderPath = "X:/bioblocksExecution/bioblocksExecutionTest/tests/auto/pythonplugins";
+            PluginFileLoader::setPluginDir(pluginFolderPath);
+
+            PythonEnvironment::GetInstance()->initEnvironment("X:/pluginScripts/interfacePlugins");
+
+            std::shared_ptr<PythonPluginAbstractFactory> pythonPlugins = std::make_shared<PythonPluginAbstractFactory>(command);
+            std::shared_ptr<DebugUserCommunications> userCom = std::make_shared<DebugUserCommunications>();
+            BioblocksExecution execution(pythonPlugins, userCom);
+
+            copyResourceFile(":/protocols/protocols/quemostat_30s.json", tempFileProtocol);
+            copyResourceFile(":/machines/machines/EVOPROG_NO_CLEANING_V2.json", tempFileMachine);
 
             std::string protocolFilePath = tempFileProtocol->fileName().toStdString();
             std::string machineFilePath = tempFileMachine->fileName().toStdString();

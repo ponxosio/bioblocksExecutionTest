@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/machines">
         <file>machines/turbidostat_test.json</file>
+        <file>machines/EVOPROG_NO_CLEANING_V2.json</file>
     </qresource>
 </RCC>
